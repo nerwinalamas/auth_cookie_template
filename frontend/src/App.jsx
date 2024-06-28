@@ -8,58 +8,25 @@ import {
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import useAuthStore from "./store/useAuth";
 import { Toaster } from "react-hot-toast";
-import { useEffect } from "react";
-import { getUser } from "./api/auth";
+import useAuthStore from "./store/useAuth";
 
-const ProtectedOutlet = () => {
-    const { isAuthenticated } = useAuthStore();
+const ProtectedRoute = () => {
+    const user = useAuthStore((state) => state.user);
 
-    if (!isAuthenticated) {
-        return <Navigate to="/login" />;
-    }
-
-    return <Outlet />;
-};
-
-const AppLayout = () => {
-    return (
-        <div>
-            {/* <Navbar /> */}
-            <ProtectedOutlet />
-        </div>
-    );
+    return user ? <Outlet /> : <Navigate to="/login" />;
 };
 
 const App = () => {
-    const { setUser, isAuthenticated } = useAuthStore();
-
-    useEffect(() => {
-        const fetchUser = async () => {
-            try {
-                if (isAuthenticated) {
-                    const data = await getUser();
-                    setUser(data.data.data)
-                    console.log("data app: ", data.data.data)
-                }
-            } catch (error) {
-                console.error('Error fetching user:', error.message);
-            }
-        };
-
-        fetchUser();
-    }, [isAuthenticated, setUser]);
-
     return (
         <div>
             <Router>
                 <Routes>
-                    <Route path="/" element={<AppLayout />}>
-                        <Route index element={<Home />} />
-                    </Route>
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
+                    <Route element={<ProtectedRoute />}>
+                        <Route path="/" element={<Home />} />
+                    </Route>
                 </Routes>
                 <Toaster />
             </Router>

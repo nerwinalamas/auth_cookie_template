@@ -17,13 +17,22 @@ const ProtectedRoute = () => {
     return user ? <Outlet /> : <Navigate to="/login" />;
 };
 
+const PublicRoute = () => {
+    const user = useAuthStore((state) => state.user);
+
+    return user ? <Navigate to="/" /> : <Outlet />;
+};
+
 const App = () => {
     return (
         <div>
             <Router>
                 <Routes>
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/register" element={<Register />} />
+                    <Route element={<PublicRoute />}>
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/register" element={<Register />} />
+                    </Route>
+
                     <Route element={<ProtectedRoute />}>
                         <Route path="/" element={<Home />} />
                     </Route>

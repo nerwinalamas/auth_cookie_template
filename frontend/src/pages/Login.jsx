@@ -6,12 +6,11 @@ import toast from "react-hot-toast";
 import useAuthStore from "../store/useAuth";
 
 const Login = () => {
-    const { setIsAuthenticated } = useAuthStore();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [emailError, setEmailError] = useState("");
     const [passwordError, setPasswordError] = useState("");
-
+    const login = useAuthStore((state) => state.login)
     const loginUserMutation = useLoginUserMutation();
     const navigate = useNavigate();
 
@@ -29,7 +28,7 @@ const Login = () => {
             { email, password },
             {
                 onSuccess: (data) => {
-                    setIsAuthenticated(data.data.success);
+                    login(data.data.data)
                     toast.success(data.data.message, { id: toastId });
                     navigate("/");
                 },
@@ -86,7 +85,11 @@ const Login = () => {
                     value={
                         loginUserMutation.isPending ? "Loading ..." : "Submit"
                     }
-                    className={`p-2 border my-2 rounded-sm ${loginUserMutation.isPending ? "bg-black/50 text-white cursor-not-allowed" : "bg-black text-white cursor-pointer"}`}
+                    className={`p-2 border my-2 rounded-sm ${
+                        loginUserMutation.isPending
+                            ? "bg-black/50 text-white cursor-not-allowed"
+                            : "bg-black text-white cursor-pointer"
+                    }`}
                     disabled={loginUserMutation.isPending}
                 />
                 <div className="w-full flex justify-center gap-2">
